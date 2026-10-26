@@ -10,88 +10,98 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#fbf7f1; --ink:#3b2f2a; --muted:#8c7e74; --line:#eee5da; --card:#fffdf9;
-  --period:#f2a6ad; --fertile:#9fd3a8; --sel:#3b2f2a;
-}
-html{background:var(--bg)}
-body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;font-size:17px;line-height:1.5;
-  max-width:480px;margin:0 auto;padding:0 20px calc(40px + env(safe-area-inset-bottom));min-height:100vh}
+:root{--bg:#fffaf3;--ink:#3b2f2a;--muted:#8c7e74;--card:#ffffff;--accent:#e8708a;--soft:#ffc9d0;--tint:#fff0f2}
+html{background:var(--tint)}
+body{background:linear-gradient(180deg,var(--tint) 0,var(--bg) 620px);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;font-size:17px;line-height:1.5;
+  max-width:480px;margin:0 auto;padding:0 18px calc(40px + env(safe-area-inset-bottom));min-height:100vh;transition:background .3s}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
-/* top */
-.top{display:flex;align-items:center;justify-content:space-between;padding:calc(18px + env(safe-area-inset-top)) 0 6px}
-.brand{font-family:'Fredoka',sans-serif;font-weight:500;font-size:22px;letter-spacing:.01em}
-.brand span{color:#e58a96}
-.today-btn{font-family:'Fredoka',sans-serif;font-weight:500;font-size:15px;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;min-height:40px}
+/* logo */
+.top{display:flex;align-items:center;justify-content:space-between;padding:calc(16px + env(safe-area-inset-top)) 0 4px}
+.logo{display:flex;align-items:center;gap:10px}
+.mark{width:44px;height:44px;border-radius:16px;background:var(--accent);display:flex;align-items:center;justify-content:center;transform:rotate(-8deg);box-shadow:0 4px 0 rgba(59,47,42,.12);transition:background .3s}
+.mark svg{width:26px;height:26px}
+.word{font-family:'Fredoka',sans-serif;line-height:1}
+.word b{display:block;font-weight:500;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);transition:color .3s}
+.word i{display:block;font-style:normal;font-weight:600;font-size:26px;letter-spacing:-.01em;margin-top:2px}
+.today-btn{font-family:'Fredoka',sans-serif;font-weight:500;font-size:15px;padding:8px 16px;border-radius:999px;background:var(--accent);color:#fff;min-height:40px;box-shadow:0 3px 0 rgba(59,47,42,.14);transition:background .3s}
 .today-btn[hidden]{display:none}
 
-/* week nav */
+.nav{display:flex;margin:12px 0 6px}
+.seg{display:flex;background:rgba(255,255,255,.75);border-radius:999px;padding:5px;width:100%;box-shadow:inset 0 0 0 1.5px rgba(59,47,42,.08)}
+.seg button{flex:1;font-family:'Fredoka',sans-serif;font-weight:500;font-size:18px;padding:11px 0;border-radius:999px;color:var(--muted);min-height:46px}
+.seg button.on{background:var(--accent);color:#fff;transition:background .3s}
+
 .weeknav{display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px}
 .weeknav .range{font-family:'Fredoka',sans-serif;font-weight:500;font-size:17px;color:var(--muted)}
-.arrow{width:44px;height:44px;border-radius:50%;font-size:22px;line-height:1;color:var(--ink);background:var(--card);border:1.5px solid var(--line)}
+.arrow{width:44px;height:44px;border-radius:50%;font-size:22px;line-height:1;color:var(--ink);background:#fff;box-shadow:0 2px 0 rgba(59,47,42,.1)}
 .arrow:disabled{opacity:.3;cursor:default}
 
-/* day strip */
-.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:18px}
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px}
 .dbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 6px;border-radius:18px;min-height:68px}
 .dbtn .wd{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em}
 .dbtn .num{font-family:'Fredoka',sans-serif;font-weight:500;font-size:20px;line-height:1.2;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%}
 .dbtn .dots{height:8px;display:flex;gap:3px}
-.dbtn .dot{width:6px;height:6px;border-radius:50%}
-.dot.p{background:var(--period)} .dot.f{background:var(--fertile)}
-.dbtn.sel .num{background:var(--sel);color:#fff}
-.dbtn.istoday:not(.sel) .num{box-shadow:inset 0 0 0 2px var(--sel)}
+.dot{width:6px;height:6px;border-radius:50%}
+.dot.p{background:#f2788f}.dot.f{background:#5bb872}
+.dbtn.sel .num{background:var(--accent);color:#fff}
+.dbtn.istoday:not(.sel) .num{box-shadow:inset 0 0 0 2px var(--accent)}
 .dbtn:disabled{opacity:.28;cursor:default}
 
-/* hero */
-.hero{border-radius:32px;overflow:hidden;background:var(--hero,#fde0e0)}
-.hero{width:200px;height:200px;margin:6px auto 0;border-radius:28px;padding:6px}
-.hero img{display:block;width:100%;height:100%;object-fit:contain}
-.titlerow{margin:16px 2px 2px;text-align:center}
-.phase{font-family:'Fredoka',sans-serif;font-weight:600;font-size:30px;line-height:1.15}
-.sub{color:var(--muted);font-weight:600;font-size:16px;margin-top:2px}
+/* hero with blob */
+.hero{position:relative;height:340px;margin:4px -6px 0;display:flex;align-items:center;justify-content:center}
+.blob{position:absolute;background:var(--soft);transition:background .3s}
+.b1{width:310px;height:300px;left:50%;top:50%;margin:-150px 0 0 -155px;border-radius:58% 42% 55% 45% / 52% 58% 42% 48%}
+.b2{width:120px;height:120px;right:4px;top:14px;border-radius:50%;opacity:.55}
+.b3{width:70px;height:70px;left:8px;bottom:22px;border-radius:44% 56% 50% 50%;opacity:.7}
+.spark{position:absolute;color:var(--accent);font-size:22px;line-height:1}
+.s1{left:22px;top:40px}.s2{right:24px;bottom:50px;font-size:16px}.s3{left:46px;bottom:90px;font-size:13px;opacity:.7}
+.hero img{position:relative;display:block;width:336px;height:336px;object-fit:contain;filter:drop-shadow(0 6px 0 rgba(59,47,42,.07))}
+
+.titlerow{margin:6px 2px 2px;text-align:center}
+.phase{font-family:'Fredoka',sans-serif;font-weight:600;font-size:34px;line-height:1.1}
+.sub{color:var(--muted);font-weight:700;font-size:16px;margin-top:4px}
 .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:12px 2px 0}
-.chip{font-weight:700;font-size:14px;padding:5px 12px;border-radius:999px;background:#f3ece3}
-.chip.p{background:#fbdfe2;color:#a4434f}
-.chip.f{background:#dcf0df;color:#3d7a4a}
-.chip.t{background:var(--ink);color:#fff}
+.chip{font-weight:800;font-size:14px;padding:5px 13px;border-radius:999px;background:#fff}
+.chip.p{background:#ffd3da;color:#b3384d}
+.chip.f{background:#cdeed4;color:#2f7a45}
+.chip.t{background:var(--accent);color:#fff}
 
-/* 3 blocks */
-.block{margin-top:22px;padding-top:18px;border-top:1.5px solid var(--line)}
-.block h3{font-family:'Fredoka',sans-serif;font-weight:500;font-size:15px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.block p{font-size:18px;line-height:1.5}
-.foot{margin:28px 2px 0;color:var(--muted);font-size:14px;line-height:1.45}
+/* cards */
+.card{margin-top:14px;padding:16px 20px 18px;border-radius:26px;background:#fff;box-shadow:0 3px 0 rgba(59,47,42,.07)}
+.card.c1{background:var(--soft)}
+.card.c3{background:var(--tint);box-shadow:inset 0 0 0 2px var(--soft)}
+.card h3{font-family:'Fredoka',sans-serif;font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+.card.c1 h3{color:var(--ink);opacity:.65}
+.card p{font-size:18px;line-height:1.5}
+.foot{margin:22px 2px 0;color:var(--muted);font-size:14px;line-height:1.45;text-align:center}
 
-/* week view */
-.summary{background:var(--card);border:1.5px solid var(--line);border-radius:26px;padding:18px 20px;margin-bottom:14px}
+/* week */
+.summary{background:var(--soft);border-radius:28px;padding:18px 20px;margin:8px 0 14px;box-shadow:0 3px 0 rgba(59,47,42,.07)}
 .summary .head{font-family:'Fredoka',sans-serif;font-weight:600;font-size:23px;line-height:1.2}
 .summary .line{margin-top:8px;font-size:17px}
-.summary .line b{font-weight:700}
-.row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:10px;border-radius:24px;margin-bottom:6px;background:transparent}
-.row.sel{background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line)}
+.summary .line b{font-weight:800}
+.row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:10px 12px 10px 10px;border-radius:26px;margin-bottom:8px;background:var(--rt,#fff);box-shadow:0 3px 0 rgba(59,47,42,.06)}
+.row.sel{box-shadow:inset 0 0 0 2.5px var(--ra,#e8708a),0 3px 0 rgba(59,47,42,.06)}
 .row:disabled{opacity:.28;cursor:default}
-.thumb{width:60px;height:60px;border-radius:18px;overflow:hidden;flex-shrink:0;background:var(--hero,#eee);padding:3px}
-.thumb img{width:100%;height:100%;object-fit:contain;display:block}
+.thumb{position:relative;width:72px;height:72px;flex-shrink:0;border-radius:50% 50% 46% 54% / 54% 46% 54% 46%;background:var(--rs,#ffc9d0);display:flex;align-items:center;justify-content:center}
+.thumb img{width:92%;height:92%;object-fit:contain;display:block}
 .rtxt{flex:1;min-width:0}
 .rtxt .d{font-family:'Fredoka',sans-serif;font-weight:500;font-size:18px;line-height:1.2}
-.rtxt .s{color:var(--muted);font-size:15px;font-weight:600}
-.tone{font-weight:700;font-size:14px;padding:5px 12px;border-radius:999px;background:#f3ece3;white-space:nowrap}
-.tone.up{background:#dcf0df;color:#3d7a4a}
-.tone.dn{background:#fde4d0;color:#a85a1f}
-
-/* bottom nav */
-.nav{display:flex;margin:8px 0 4px}
-.seg{display:flex;background:#f1e9de;border-radius:999px;padding:5px;width:100%}
-.seg button{flex:1;font-family:'Fredoka',sans-serif;font-weight:500;font-size:18px;padding:12px 0;border-radius:999px;color:var(--muted);min-height:48px}
-.seg button.on{background:var(--ink);color:#fff}
+.rtxt .s{color:var(--muted);font-size:15px;font-weight:700}
+.tone{font-weight:800;font-size:14px;padding:5px 12px;border-radius:999px;background:#fff;white-space:nowrap}
+.tone.up{background:#cdeed4;color:#2f7a45}
+.tone.dn{background:#ffdcc0;color:#a85a1f}
 .view[hidden]{display:none}
 </style>
 </head>
 <body>
 
 <div class="top">
-  <div class="brand">audra's <span>forecast</span></div>
+  <div class="logo">
+    <div class="mark"><svg viewBox="0 0 32 32" fill="#fff"><path d="M16 28C8 22 3 17.5 3 11.5 3 7.4 6 5 9.3 5c2.7 0 5 1.6 6.7 4.3C17.700 6.600 20 5 22.700 5 26 5 29 7.400 29 11.500 29 17.500 24 22 16 28z"/></svg></div>
+    <div class="word"><b>Audra's</b><i>Forecast</i></div>
+  </div>
   <button class="today-btn" id="todayBtn" hidden>Today</button>
 </div>
 
@@ -143,13 +153,12 @@ function info(n){
 
 /* ---------- phases + drawings ---------- */
 const PHASES = [
-  {to:2,  key:'menstruation',    name:'Menstruation',    days:'Days 1-2',   bg:'#fde0e0'},
-  {to:6,  key:'early-menstrual', name:'Early menstrual', days:'Days 3-6',   bg:'#fddde3'},
-  {to:12, key:'follicular',      name:'Follicular',      days:'Days 7-12',  bg:'#dde8fb'},
-  {to:15, key:'ovulation',       name:'Ovulation',       days:'Days 13-15', bg:'#d6ecd6'},
-  {to:20, key:'early-luteal',    name:'Early luteal',    days:'Days 16-20', bg:'#fdf0bf'},
-  {to:26, key:'late-luteal',     name:'Late luteal',     days:'Days 21-26', bg:'#fbd9b3'},
-  {to:99, key:'premenstrual',    name:'Premenstrual',    days:'Day 27+',    bg:'#fbdbe4'},
+  {to:3,  key:'menstruation',    name:'Menstruation',    bg:'#ffc3cc', tint:'#fff0f2', acc:'#e5617e'},
+  {to:6,  key:'early-menstrual', name:'Early menstrual', bg:'#d8d0f6', tint:'#f5f2fe', acc:'#8470d8'},
+  {to:12, key:'follicular',      name:'Follicular',      bg:'#bddcf8', tint:'#eef6fe', acc:'#3f8ed8'},
+  {to:15, key:'ovulation',       name:'Ovulation',       bg:'#bfe8c6', tint:'#eefaf0', acc:'#3fa35c'},
+  {to:20, key:'early-luteal',    name:'Early luteal',    bg:'#ffe39a', tint:'#fff8df', acc:'#d99a10'},
+  {to:99, key:'late-luteal',     name:'Late luteal',     bg:'#ffcc9c', tint:'#fff1e3', acc:'#e57a30'},
 ];
 const phaseOf = day => PHASES.find(p=>day<=p.to);
 
@@ -318,30 +327,41 @@ function renderStrip(){
   $('strip').innerHTML=h;
 }
 
+function theme(p){
+  const r=document.documentElement.style;
+  r.setProperty('--accent',p.acc);r.setProperty('--soft',p.bg);r.setProperty('--tint',p.tint);
+  const m=document.querySelector('meta[name=theme-color]'); if(m) m.content=p.tint;
+}
 function renderDay(){
   renderStrip();
   const i=info(state.sel);
   if(!i){ $('dayBody').innerHTML='<p class="foot">No forecast for this date.</p>'; return; }
   const p=phaseOf(i.day), c=dayData(i.day);
+  theme(p);
   let chips='';
   if(state.sel===TODAY) chips+='<span class="chip t">Today</span>';
   if(i.period) chips+='<span class="chip p">Period</span>';
   if(i.fertile) chips+='<span class="chip f">Fertile window</span>';
   $('dayBody').innerHTML=`
-    <div class="hero" style="--hero:${p.bg}"><img src="img/${p.key}.webp" alt="" width="520" height="440"></div>
+    <div class="hero">
+      <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+      <span class="spark s1">&#10022;</span><span class="spark s2">&#10022;</span><span class="spark s3">&#10022;</span>
+      <img src="img/${p.key}.webp" alt="" width="336" height="336">
+    </div>
     <div class="titlerow">
       <div class="phase">${p.name}</div>
       <div class="sub">Day ${i.day} &middot; ${fmtLong(state.sel)}</div>
     </div>
     ${chips?`<div class="chips">${chips}</div>`:''}
-    <div class="block"><h3>Already documented</h3><p>${c.d}</p></div>
-    <div class="block"><h3>What's happening</h3><p>${c.b}</p></div>
-    <div class="block"><h3>Keep in mind</h3><p>${c.k}</p></div>
+    <div class="card c1"><h3>Already documented</h3><p>${c.d}</p></div>
+    <div class="card"><h3>What's happening</h3><p>${c.b}</p></div>
+    <div class="card c3"><h3>Keep in mind</h3><p>${c.k}</p></div>
     <p class="foot">Based on your Garmin cycle data and the patterns you've reported. Dates after Oct 25 are forecasts.</p>`;
 }
 
 function renderWeek(){
   const ws=weekStart(state.sel);
+  const si=info(state.sel); if(si) theme(phaseOf(si.day));
   const days=[]; for(let k=0;k<7;k++){ const n=ws+k, i=info(n); if(i) days.push({n,i,p:phaseOf(i.day),c:dayData(i.day)}); }
   // summary
   const phases=[]; days.forEach(x=>{ if(!phases.includes(x.p.name)) phases.push(x.p.name); });
@@ -357,8 +377,8 @@ function renderWeek(){
     const n=ws+k, i=info(n);
     if(!i){ rows+=`<button class="row" disabled><div class="rtxt"><div class="d">${fmtLong(n)}</div><div class="s">outside forecast</div></div></button>`; continue; }
     const p=phaseOf(i.day), c=dayData(i.day);
-    rows+=`<button class="row${n===state.sel?' sel':''}" data-n="${n}">
-      <div class="thumb" style="--hero:${p.bg}"><img src="img/${p.key}.webp" alt="" loading="lazy"></div>
+    rows+=`<button class="row${n===state.sel?' sel':''}" data-n="${n}" style="--rt:${p.tint};--ra:${p.acc}">
+      <div class="thumb" style="--rs:${p.bg}"><img src="img/${p.key}.webp" alt="" loading="lazy"></div>
       <div class="rtxt"><div class="d">${fmtLong(n)}</div><div class="s">Day ${i.day} &middot; ${p.name}</div></div>
       <span class="tone${c.l>0?' up':c.l<0?' dn':''}">${c.t}</span></button>`;
   }
