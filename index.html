@@ -1,644 +1,388 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Audra Forecast</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400;1,9..144,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf7f1">
+<title>Audra's Forecast</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-:root {
-  --white:#ffffff; --off:#f7f5f2; --ink:#1a1a1a; --mid:#777; --light:#e5e2de;
-  --period:#e74c3c; --follicular:#2ecc71; --ovulation:#9b59b6;
-  --luteal-e:#e67e22; --luteal-m:#5dade2; --luteal-l:#2980b9;
-  --fertility-none:#ccc; --fertility-low:#a8d5b5; --fertility-high:#e8a030; --fertility-peak:#d63b2f;
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#fbf7f1; --ink:#3b2f2a; --muted:#8c7e74; --line:#eee5da; --card:#fffdf9;
+  --period:#f2a6ad; --fertile:#9fd3a8; --sel:#3b2f2a;
 }
-body { background:var(--white); color:var(--ink); font-family:'DM Sans',sans-serif; min-height:100vh; padding-bottom:60px; }
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;font-size:17px;line-height:1.5;
+  max-width:480px;margin:0 auto;padding:0 20px calc(110px + env(safe-area-inset-bottom));min-height:100vh}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
-header { background:var(--ink); padding:20px 20px 16px; position:fixed; top:0; left:0; right:0; z-index:200; }
-.header-eye { font-size:11px; letter-spacing:0.18em; text-transform:uppercase; color:#666; margin-bottom:4px; }
-.header-title { font-family:'Bebas Neue',sans-serif; font-size:38px; letter-spacing:0.04em; line-height:1; color:#fff; }
-.header-title span { color:#f59e0b; }
-.tabs { display:flex; border-bottom:2px solid var(--ink); position:fixed; top:0; left:0; right:0; background:var(--white); z-index:199; }
-.tab { flex:1; padding:15px 0; text-align:center; font-size:12px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--mid); cursor:pointer; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
-.tab.active { color:var(--ink); border-bottom-color:var(--ink); }
+/* top */
+.top{display:flex;align-items:center;justify-content:space-between;padding:calc(18px + env(safe-area-inset-top)) 0 6px}
+.brand{font-family:'Fredoka',sans-serif;font-weight:500;font-size:22px;letter-spacing:.01em}
+.brand span{color:#e58a96}
+.today-btn{font-family:'Fredoka',sans-serif;font-weight:500;font-size:15px;padding:8px 16px;border-radius:999px;background:var(--ink);color:#fff;min-height:40px}
+.today-btn[hidden]{display:none}
 
-.date-scroll { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
-.date-scroll::-webkit-scrollbar { display:none; }
-.month-group { flex-shrink:0; }
-.month-name { font-size:10px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--mid); margin-bottom:6px; padding-left:2px; }
-.month-days { display:flex; gap:6px; }
+/* week nav */
+.weeknav{display:flex;align-items:center;justify-content:space-between;margin:10px 0 6px}
+.weeknav .range{font-family:'Fredoka',sans-serif;font-weight:500;font-size:17px;color:var(--muted)}
+.arrow{width:44px;height:44px;border-radius:50%;font-size:22px;line-height:1;color:var(--ink);background:var(--card);border:1.5px solid var(--line)}
+.arrow:disabled{opacity:.3;cursor:default}
 
-.day-btn { width:44px; height:56px; border-radius:6px; border:1.5px solid var(--light); background:var(--white); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; flex-shrink:0; transition:all 0.15s; }
-.day-btn:active { transform:scale(0.95); }
-.day-btn.phase-period     { border-color:var(--period); }
-.day-btn.phase-follicular { border-color:var(--follicular); }
-.day-btn.phase-ovulation  { border-color:var(--ovulation); }
-.day-btn.phase-luteal-e   { border-color:var(--luteal-e); }
-.day-btn.phase-luteal-m   { border-color:var(--luteal-m); }
-.day-btn.phase-luteal-l   { border-color:var(--luteal-l); }
-.day-btn.selected.phase-period     { background:var(--period);    border-color:var(--period); }
-.day-btn.selected.phase-follicular { background:var(--follicular); border-color:var(--follicular); }
-.day-btn.selected.phase-ovulation  { background:var(--ovulation);  border-color:var(--ovulation); }
-.day-btn.selected.phase-luteal-e   { background:var(--luteal-e);   border-color:var(--luteal-e); }
-.day-btn.selected.phase-luteal-m   { background:var(--luteal-m);   border-color:var(--luteal-m); }
-.day-btn.selected.phase-luteal-l   { background:var(--luteal-l);   border-color:var(--luteal-l); }
-.day-btn.selected .dnum  { color:#fff; }
-.day-btn.selected .dname { color:rgba(255,255,255,0.6); }
-.day-btn.selected .dpip  { background:rgba(255,255,255,0.5) !important; }
-.dnum  { font-family:'Bebas Neue',sans-serif; font-size:20px; line-height:1; color:var(--ink); }
-.dname { font-size:9px; letter-spacing:0.08em; text-transform:uppercase; color:var(--mid); }
-.dpip  { width:5px; height:5px; border-radius:50%; }
-.day-btn.phase-period     .dpip { background:var(--period); }
-.day-btn.phase-follicular .dpip { background:var(--follicular); }
-.day-btn.phase-ovulation  .dpip { background:var(--ovulation); }
-.day-btn.phase-luteal-e   .dpip { background:var(--luteal-e); }
-.day-btn.phase-luteal-m   .dpip { background:var(--luteal-m); }
-.day-btn.phase-luteal-l   .dpip { background:var(--luteal-l); }
+/* day strip */
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:18px}
+.dbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 6px;border-radius:18px;min-height:68px}
+.dbtn .wd{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em}
+.dbtn .num{font-family:'Fredoka',sans-serif;font-weight:500;font-size:20px;line-height:1.2;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.dbtn .dots{height:8px;display:flex;gap:3px}
+.dbtn .dot{width:6px;height:6px;border-radius:50%}
+.dot.p{background:var(--period)} .dot.f{background:var(--fertile)}
+.dbtn.sel .num{background:var(--sel);color:#fff}
+.dbtn.istoday:not(.sel) .num{box-shadow:inset 0 0 0 2px var(--sel)}
+.dbtn:disabled{opacity:.28;cursor:default}
 
-.detail-section { padding:0 20px; }
+/* hero */
+.hero{border-radius:32px;overflow:hidden;background:var(--hero,#fde0e0)}
+.hero img{display:block;width:100%;aspect-ratio:520/440;object-fit:cover;object-position:center 30%}
+.titlerow{margin:18px 2px 2px}
+.phase{font-family:'Fredoka',sans-serif;font-weight:600;font-size:30px;line-height:1.15}
+.sub{color:var(--muted);font-weight:600;font-size:16px;margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 2px 0}
+.chip{font-weight:700;font-size:14px;padding:5px 12px;border-radius:999px;background:#f3ece3}
+.chip.p{background:#fbdfe2;color:#a4434f}
+.chip.f{background:#dcf0df;color:#3d7a4a}
+.chip.t{background:var(--ink);color:#fff}
 
-.day-hero { padding:22px 0 16px; border-bottom:1.5px solid var(--light); }
-.day-hero-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
-.day-hero-date { font-family:'Bebas Neue',sans-serif; font-size:34px; line-height:1; letter-spacing:0.03em; }
-.phase-badge { display:inline-flex; align-items:center; padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#fff; flex-shrink:0; margin-top:4px; }
-.day-num-label { font-size:13px; color:var(--mid); margin-top:2px; }
+/* 3 blocks */
+.block{margin-top:22px;padding-top:18px;border-top:1.5px solid var(--line)}
+.block h3{font-family:'Fredoka',sans-serif;font-weight:500;font-size:15px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.block p{font-size:18px;line-height:1.5}
+.foot{margin:28px 2px 0;color:var(--muted);font-size:14px;line-height:1.45}
 
-.fertility-bar { display:flex; align-items:center; gap:10px; margin-top:12px; }
-.fertility-label { font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--mid); white-space:nowrap; }
-.fertility-pill { padding:5px 14px; border-radius:20px; font-size:12px; font-weight:600; color:#fff; }
-.fertility-none  { background:#999; }
-.fertility-low   { background:#2ecc71; }
-.fertility-medium{ background:#e67e22; }
-.fertility-high  { background:#e8a030; }
-.fertility-peak  { background:#e74c3c; }
+/* week view */
+.summary{background:var(--card);border:1.5px solid var(--line);border-radius:26px;padding:18px 20px;margin-bottom:14px}
+.summary .head{font-family:'Fredoka',sans-serif;font-weight:600;font-size:23px;line-height:1.2}
+.summary .line{margin-top:8px;font-size:17px}
+.summary .line b{font-weight:700}
+.row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:10px;border-radius:24px;margin-bottom:6px;background:transparent}
+.row.sel{background:var(--card);box-shadow:inset 0 0 0 1.5px var(--line)}
+.row:disabled{opacity:.28;cursor:default}
+.thumb{width:68px;height:60px;border-radius:18px;overflow:hidden;flex-shrink:0;background:var(--hero,#eee)}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block}
+.rtxt{flex:1;min-width:0}
+.rtxt .d{font-family:'Fredoka',sans-serif;font-weight:500;font-size:18px;line-height:1.2}
+.rtxt .s{color:var(--muted);font-size:15px;font-weight:600}
+.tone{font-weight:700;font-size:14px;padding:5px 12px;border-radius:999px;background:#f3ece3;white-space:nowrap}
+.tone.up{background:#dcf0df;color:#3d7a4a}
+.tone.dn{background:#fde4d0;color:#a85a1f}
 
-.info-card { margin-top:16px; border:1.5px solid var(--light); border-radius:6px; overflow:hidden; }
-.card-header { padding:12px 16px; border-bottom:1.5px solid var(--light); background:var(--off); }
-.card-label { font-size:11px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; }
-.card-label.bio     { color:var(--mid); }
-.card-label.who     { color:var(--ovulation); }
-.card-label.avoid   { color:var(--period); }
-.card-label.green   { color:var(--follicular); }
-
-.info-row { display:flex; gap:12px; padding:13px 16px; border-bottom:1px solid var(--light); align-items:flex-start; font-size:15px; line-height:1.5; }
-.info-row:last-child { border-bottom:none; }
-.row-icon { font-size:13px; flex-shrink:0; margin-top:3px; }
-
-.pull-quote { margin-top:16px; padding:16px 18px; background:var(--off); border-left:4px solid var(--ink); }
-.pull-quote p { font-family:'Fraunces',serif; font-style:italic; font-size:16px; line-height:1.55; color:var(--ink); }
-
-.picker-section { padding:20px 20px 16px; border-bottom:2px solid var(--ink); background:var(--off); }
-.picker-label { font-size:11px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--mid); margin-bottom:12px; }
-
-
-.month-title { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:0.05em; color:var(--ink); padding:20px 0 4px; border-top:2px solid var(--ink); }
-.month-title:first-child { border-top:none; padding-top:16px; }
-.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:8px; }
-.cal-day-label { text-align:center; font-size:10px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--mid); padding:6px 0 8px; }
-.cal-cell { aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:4px; font-size:13px; font-weight:500; position:relative; background:var(--off); color:var(--ink); }
-.cal-cell.empty { background:transparent; }
-.cal-cell.is-today { background:var(--ink) !important; color:#fff !important; font-weight:700; }
-.cal-cell .cpip { position:absolute; bottom:4px; width:5px; height:5px; border-radius:50%; }
-.cal-cell.period-day     { background:rgba(231,76,60,0.15); } .cal-cell.period-day .cpip     { background:#e74c3c; }
-.cal-cell.follicular-day { background:rgba(46,204,113,0.15);  } .cal-cell.follicular-day .cpip { background:#2ecc71; }
-.cal-cell.ovulation-day  { background:rgba(155,89,182,0.15); } .cal-cell.ovulation-day .cpip  { background:#9b59b6; }
-.cal-cell.luteal-e-day   { background:rgba(230,126,34,0.15);   } .cal-cell.luteal-e-day .cpip   { background:#e67e22; }
-.cal-cell.luteal-m-day   { background:rgba(93,173,226,0.2); } .cal-cell.luteal-m-day .cpip   { background:#5dade2; }
-.cal-cell.luteal-l-day   { background:rgba(41,128,185,0.15);  } .cal-cell.luteal-l-day .cpip   { background:#2980b9; }
-
-.cal-legend { display:flex; flex-wrap:wrap; gap:8px 14px; padding:16px 0 4px; }
-.cal-legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--mid); font-weight:500; }
-.cal-legend-dot { width:9px; height:9px; border-radius:2px; flex-shrink:0; }
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:10px 20px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,rgba(251,247,241,0))}
+.seg{display:flex;background:#f1e9de;border-radius:999px;padding:5px;width:100%;max-width:340px}
+.seg button{flex:1;font-family:'Fredoka',sans-serif;font-weight:500;font-size:18px;padding:12px 0;border-radius:999px;color:var(--muted);min-height:48px}
+.seg button.on{background:var(--ink);color:#fff}
+.view[hidden]{display:none}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-eye">Guide pratique · Cycle 28j</div>
-  <div class="header-title">AUDRA <span>FORECAST</span></div>
-</header>
-
-<div class="tabs">
-  <div class="tab active" id="tab-day" onclick="switchTab('day')">Par jour</div>
-  <div class="tab" id="tab-cal" onclick="switchTab('cal')">Calendrier</div>
+<div class="top">
+  <div class="brand">audra's <span>forecast</span></div>
+  <button class="today-btn" id="todayBtn" hidden>Today</button>
 </div>
 
-<div id="view-day">
-  <div class="picker-section">
-    <div class="picker-label">Sélectionne une date</div>
-    <div class="date-scroll" id="dateScroll"></div>
-  </div>
-  <div class="detail-section" id="detailSection">
-    <div class="no-data">← Choisis une date</div>
-  </div>
+<div class="weeknav">
+  <button class="arrow" id="prevW" aria-label="Previous week">&#8249;</button>
+  <div class="range" id="range"></div>
+  <button class="arrow" id="nextW" aria-label="Next week">&#8250;</button>
 </div>
 
-<div id="view-cal" style="display:none; padding:0 16px 40px;"></div>
+<div class="view" id="vDay">
+  <div class="strip" id="strip"></div>
+  <div id="dayBody"></div>
+</div>
+
+<div class="view" id="vWeek" hidden>
+  <div id="weekBody"></div>
+</div>
+
+<div class="nav">
+  <div class="seg">
+    <button id="tDay" class="on">Day</button>
+    <button id="tWeek">Week</button>
+  </div>
+</div>
 
 <script>
-const CYCLES = [
-  new Date(2026,6,31), // Jul 31
-  new Date(2026,7,28), // Aug 28
-  new Date(2026,8,25), // Sep 25
-  new Date(2026,9,23), // Oct 23
-  new Date(2026,10,20),// Nov 20
-  new Date(2026,11,18),// Dec 18
-  new Date(2027,0,15), // Jan 15 (buffer)
-];
-const PHASE_META = {
-  period:    {label:'Règles',       color:'var(--period)',    cls:'phase-period'},
-  follicular:{label:'Folliculaire', color:'var(--follicular)',cls:'phase-follicular'},
-  ovulation: {label:'Ovulation',    color:'var(--ovulation)', cls:'phase-ovulation'},
-  'luteal-e':{label:'Post-ovul.',   color:'var(--luteal-e)',  cls:'phase-luteal-e'},
-  'luteal-m':{label:'Lutéale',      color:'var(--luteal-m)',  cls:'phase-luteal-m'},
-  'luteal-l':{label:'Pré-règles',   color:'var(--luteal-l)',  cls:'phase-luteal-l'},
-};
+/* ---------- cycle data (Garmin) ---------- */
+const dn = (y,m,d) => Date.UTC(y,m,d)/864e5;               // timezone/DST-safe day number
+const dt = n => new Date(n*864e5);
+const WD  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MO  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// Fertility: none / low / medium / high / peak
-// Based on 29d cycle, ovulation ~day 14, sperm survival 3-5d, egg 12-24h
-// Fertile window typically days 9-15, peak days 12-14
-const FERTILITY = {
-  1:'none',2:'none',3:'none',4:'none',5:'none',6:'none',7:'none',8:'none',
-  9:'none',10:'low',11:'medium',12:'peak',13:'peak',14:'peak',
-  15:'low',16:'none',17:'none',18:'none',19:'none',20:'none',
-  21:'none',22:'none',23:'none',24:'none',25:'none',26:'none',27:'none',28:'none',29:'none'
-};
-const FERTILITY_LABEL = {
-  none:'Infertile',low:'Fertilité basse',medium:'Fertilité modérée',high:'Fertile',peak:'Pic de fertilité'
-};
+// period starts: Aug 27, Sep 25, Oct 25 = logged. Nov 22 onward = Garmin forecast (28-day cycles)
+const STARTS = [[2026,7,27],[2026,8,25],[2026,9,25],[2026,10,22],[2026,11,20],[2027,0,17],[2027,1,14],[2027,2,14],[2027,3,11]].map(a=>dn(...a));
+const RANGE_START = STARTS[0];
+const RANGE_END   = dn(2027,2,31);
+const PERIOD_LEN  = 8;
 
-const DAY_DATA = {
-  1:{
-    bio:[
-      "Chute brutale de progestérone et d'œstrogènes — les prostaglandines déclenchent les contractions utérines.",
-
-      "Flux léger en début de journée, l'endomètre commence à peine à se détacher.",
-    ],
-    mood:"Soulagement émotionnel quasi-immédiat — la tension pré-règles se dissipe. Humeur plus stable qu'elle ne l'a été depuis une semaine.",
-    avoid:["Ibuprofène plus efficace que paracétamol ici — il agit sur les prostaglandines elles-mêmes."],
-    prioritize:["Chaleur locale réduit les contractions par vasodilatation."],
-  },
-  2:{
-    bio:[
-      "Flux au maximum. Prostaglandines encore très actives — crampes potentiellement nocturnes.",
-      "Fatigue liée à la perte de sang et à l'effet vasodilateur des prostaglandines.",
-    ],
-    mood:"Douleur physique encore présente mais le calme émotionnel tient.",
-    avoid:[],
-    prioritize:["Aliments riches en fer — les pertes commencent à affecter l'énergie."],
-  },
-  3:{
-    bio:[
-      "Rétention d'eau maximale — œstrogènes qui remontent légèrement + progestérone encore basse favorisent la rétention.",
-      "Ballonnements intestinaux fréquents : les prostaglandines ralentissent encore le transit.",
-      "Flux abondant, endomètre presque entièrement détaché.",
-    ],
-    mood:"Jour le plus gonflé du cycle. Ballonnements maximaux. Confiance corporelle basse.",
-    avoid:["Sel et sucre en excès aggravent la rétention."],
-    prioritize:["Alimentation sobre, hydratation."],
-  },
-  4:{
-    bio:[
-      "Flux qui diminue. Prostaglandines en baisse — crampes qui s'atténuent.",
-      "Fatigue accumulée sur 3 jours de pertes toujours présente.",
-      "Les œstrogènes amorcent leur remontée, lentement.",
-    ],
-    mood:"Encore gonflée. La rétention ne disparaît pas d'un coup. Pas encore de remontée émotionnelle franche.",
-    avoid:[],
-    prioritize:["Protéines et fer — la reconstruction de l'endomètre commence."],
-  },
-  5:{
-    bio:[
-      "FSH en hausse — plusieurs follicules entrent en maturation.",
-      "Les œstrogènes montent. Les douleurs disparaissent, l'utérus a fini de se contracter.",
-    ],
-    mood:"Début de remontée. L'énergie revient progressivement mais pas nécessairement de façon linéaire.",
-    avoid:[],
-    prioritize:[],
-  },
-  6:{
-    bio:[
-      "Œstrogènes en montée. Muqueuse utérine qui se reconstitue.",
-      "La transition hormonale n'est pas toujours linéaire — un creux inattendu reste possible.",
-    ],
-    mood:"Généralement mieux, mais un creux inattendu ce jour est possible. Pas une anomalie.",
-    avoid:[],
-    prioritize:[],
-  },
-  7:{
-    bio:[
-      "Un follicule dominant s'impose. Les œstrogènes stimulent la dopamine.",
-      "Amélioration progressive de l'humeur et de la motivation.",
-    ],
-    mood:"Élan qui revient. Motivation en hausse, focus amélioré.",
-    avoid:[],
-    prioritize:[],
-  },
-  8:{
-    bio:[
-      "Endomètre reconstitué. Énergie en nette amélioration.",
-      "Dopamine et sérotonine remontent avec les œstrogènes.",
-    ],
-    mood:"Humeur stable et positive. Récupération physique et mentale bien engagée.",
-    avoid:[],
-    prioritize:[],
-  },
-  9:{
-    bio:[
-      "Œstrogènes en montée franche. Cognition et mémoire verbale à leur meilleur.",
-      "La peau est souvent au meilleur de son état — les œstrogènes stimulent le collagène.",
-      "Mucus cervical commence à changer — premier signe préovulatoire.",
-    ],
-    mood:"Phase de clarté. Confiance en hausse, lecture sociale fine, capacité de concentration élevée.",
-    avoid:[],
-    prioritize:[],
-  },
-  10:{
-    bio:[
-      "Follicule dominant qui grossit rapidement, œstrogènes en hausse.",
-      "Mucus plus abondant et filant. LH commence à monter.",
-    ],
-    mood:"Énergie soutenue. Sociabilité et ouverture aux autres à leur meilleur.",
-    avoid:[],
-    prioritize:[],
-  },
-  11:{
-    bio:[
-      "Pic de LH en préparation. Œstrogènes proches de leur maximum.",
-      "Mucus abondant, transparent, filant — fenêtre fertile active.",
-      "Sensibilité physique accrue, poitrine notamment.",
-    ],
-    mood:"Ouverture émotionnelle forte. Libido en hausse. L'intensité peut aller dans les deux sens.",
-    avoid:[],
-    prioritize:[],
-  },
-  12:{
-    bio:[
-      "Œstrogènes au pic du cycle. Testostérone légèrement plus haute — libido au maximum.",
-      "Empathie et lecture sociale à leur apogée neurologique.",
-    ],
-    mood:"Confiance et énergie au sommet. Mais la vulnérabilité émotionnelle est aussi à son pic — les hauts et les bas sont amplifiés simultanément.",
-    avoid:["L'intensité émotionnelle peut faire prendre des décisions ou des lectures de situation qui semblent évidentes mais méritent d'être vérifiées hors pic."],
-    prioritize:[],
-  },
-  13:{
-    bio:[
-      "Pic de LH déclenché — ovulation imminente dans 24–36h.",
-      "Légère douleur pelvienne d'un côté possible (Mittelschmerz).",
-    ],
-    mood:"Pic de confiance et d'assertivité. Sensibilité au rejet également à son maximum ce jour.",
-    avoid:[],
-    prioritize:[],
-  },
-  14:{
-    bio:[
-      "Ovulation : le follicule libère l'ovocyte. Température basale qui monte légèrement.",
-      "Fin de la fenêtre œstrogénique — progestérone qui commence à monter.",
-      "L'ovocyte est viable 12–24h maximum après l'ovulation.",
-    ],
-    mood:"Chute possible dès aujourd'hui — dépression soudaine et perte de confiance en fin de phase ovulatoire.",
-    avoid:["Les décisions prises dans un creux émotionnel post-ovulatoire méritent d'être revisitées à tête reposée."],
-    prioritize:[],
-  },
-  15:{
-    bio:[
-      "Corps jaune formé — sécrétion de progestérone en hausse.",
-      "Température basale +0,2–0,5°C, confirmation post-ovulatoire.",
-      "Énergie et clarté mentale qui commencent à baisser.",
-    ],
-    mood:"Descente post-pic bien installée. Manque de confiance, humeur plus basse. La confiance commence à revenir progressivement mais pas encore aujourd'hui.",
-    avoid:[],
-    prioritize:[],
-  },
-  16:{
-    bio:[
-      "Progestérone en montée. Digestion ralentie, ballonnements légers possibles.",
-      "Le métabolisme accélère légèrement — besoins caloriques +100–300 kcal/j en phase lutéale.",
-    ],
-    mood:"Humeur en légère remontée par rapport aux jours 14–15, mais l'élan est absent. Période intérieure, moins extravertie.",
-    avoid:[],
-    prioritize:[],
-  },
-  17:{
-    bio:[
-      "Progestérone continue de monter. Rétention d'eau légère qui revient.",
-      "Flux sanguin vers les seins augmente — sensibilité mammaire fréquente.",
-    ],
-    mood:"Relativement stable. La progestérone a un effet légèrement sédatif à ce stade — calme possible mais aussi tendance au retrait.",
-    avoid:[],
-    prioritize:[],
-  },
-  18:{
-    bio:[
-      "Sérotonine qui commence à fluctuer avec la progestérone.",
-      "Sommeil souvent plus long mais moins récupérateur à partir d'ici.",
-    ],
-    mood:"Début de fluctuation de l'humeur. Rien de marqué encore, mais la stabilité des jours précédents commence à s'effriter.",
-    avoid:[],
-    prioritize:[],
-  },
-  19:{
-    bio:[
-      "Progestérone proche de son pic.",
-      "Légère remontée secondaire d'œstrogènes avant leur chute finale.",
-    ],
-    mood:"La mini-remontée d'œstrogènes peut créer un bref moment de clarté avant la descente finale. Ne pas y lire une tendance.",
-    avoid:[],
-    prioritize:[],
-  },
-  20:{
-    bio:[
-      "Œstrogènes secondaires qui redescendent. Progestérone au pic.",
-      "GABA et sérotonine commencent à baisser sous l'effet du catabolisme de la progestérone.",
-    ],
-    mood:"Début de la descente SPM. Sensibilité émotionnelle en hausse, humeur moins prévisible.",
-    avoid:[],
-    prioritize:[],
-    note:"La progestérone se métabolise en alloprégnanolone — une neurostéroïde qui agit sur les récepteurs GABA. Chez certaines femmes, l'effet est anxiogène plutôt que sédatif."
-  },
-  21:{
-    bio:[
-      "Progestérone et œstrogènes tous deux en chute.",
-      "Sérotonine qui baisse avec les œstrogènes — irritabilité et hypersensibilité possibles.",
-      "L'utérus reçoit les premiers signaux de préparer les règles.",
-    ],
-    mood:"Irritabilité possible, hypersensibilité relationnelle. Les interactions neutres peuvent être lues négativement.",
-    avoid:["Les stimuli émotionnels et physiques sont perçus plus intensément que la réalité ne le justifie — garder ça en tête avant de réagir."],
-    prioritize:[],
-  },
-  22:{
-    bio:[
-      "Chute hormonale continue.",
-      "Seuil de douleur qui baisse avec les œstrogènes — stimuli perçus plus intensément.",
-      "Insomnie possible — progestérone basse perturbe le sommeil profond.",
-    ],
-    mood:"Sensibilité physique et émotionnelle augmentée. La fatigue amplifie tout si le sommeil est perturbé.",
-    avoid:[],
-    prioritize:["Sommeil en priorité — la dette se cumule vite ici."],
-  },
-  23:{
-    bio:[
-      "Prostaglandines qui commencent à s'accumuler dans l'endomètre.",
-      "Acné hormonale possible — chute d'œstrogènes déséquilibre le sébum.",
-      "Ballonnements qui reviennent.",
-    ],
-    mood:"Corps inconfortable, humeur variable. Pas nécessairement déprimée — mais peu de marge de tolérance.",
-    avoid:[],
-    prioritize:[],
-  },
-  24:{
-    bio:[
-      "Hormones en chute marquée. Noradrénaline en hausse en compensation.",
-      "Testostérone relative qui augmente quand la progestérone baisse — libido possible.",
-    ],
-    mood:"Variable selon le cycle. Peut être ok — ou agitée, décisive, urgente si le stress est présent. L'énergie est là mais elle est bruyante.",
-    avoid:["Décisions majeures prises dans cet état d'urgence hormonale méritent d'être revisitées."],
-    prioritize:[],
-  },
-  25:{
-    bio:[
-      "Rétention d'eau en hausse. Seins tendus.",
-      "Sommeil perturbé — difficulté à s'endormir et réveils possibles.",
-    ],
-    mood:"Selon le cycle : stable ou anxieuse. L'insomnie amplifie tout ce qui est déjà présent émotionnellement.",
-    avoid:[],
-    prioritize:[],
-  },
-  26:{
-    bio:[
-      "Endomètre qui se prépare activement à la desquamation.",
-      "Crampes légères pré-règles possibles. Thermorégulation légèrement perturbée.",
-    ],
-    mood:"Derniers jours avant les règles. Peut être dans l'urgence ou dans le calme selon le cycle — les deux sont possibles.",
-    avoid:[],
-    prioritize:[],
-  },
-  27:{
-    bio:[
-      "Progestérone et œstrogènes quasi à zéro.",
-      "Sérotonine au plancher — réactivité émotionnelle haute.",
-    ],
-    mood:"Si le cycle a été stressant : anxiété et agitation au maximum. Sérotonine au plancher — tout est amplifié.",
-    avoid:["Décisions ou conversations qui demandent de la sérénité et du recul."],
-    prioritize:[],
-  },
-  28:{
-    bio:[
-      "Toutes les hormones à leur minimum.",
-      "Contractions utérines légères souvent présentes avant même le flux.",
-    ],
-    mood:"Bout du cycle. Peut ressentir une forme d'épuisement ou au contraire une impatience que les règles arrivent et que le reset commence.",
-    avoid:[],
-    prioritize:[],
-  },
-  29:{
-    bio:[
-      "Fin du cycle — règles imminentes ou déjà là.",
-      "La chute finale de progestérone déclenche la desquamation de l'endomètre.",
-    ],
-    mood:"Reset imminent. L'inconfort pré-règles est à son pic mais le soulagement arrive avec le flux.",
-    avoid:[],
-    prioritize:[],
-  },
-};
-
-const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
-const START = new Date(2026,6,31);
-const END   = new Date(2027,0,14);
-const DN_SHORT = ['Di','Lu','Ma','Me','Je','Ve','Sa'];
-const MN_SHORT = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
-const MN_LONG  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-const DN_LONG  = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-
-function getCycleDay(date) {
-  for (let i=0;i<CYCLES.length;i++) {
-    const d = Math.floor((date-CYCLES[i])/86400000)+1;
-    const next = CYCLES[i+1]||new Date(2027,0,23);
-    const len = Math.floor((next-CYCLES[i])/86400000);
-    if (d>=1&&d<=len) return {day:d,cycleLen:len};
+function info(n){
+  if(n<RANGE_START||n>RANGE_END) return null;
+  for(let i=0;i<STARTS.length-1;i++){
+    if(n>=STARTS[i]&&n<STARTS[i+1]){
+      const len=STARTS[i+1]-STARTS[i], day=n-STARTS[i]+1;
+      return {day,len,period:day<=PERIOD_LEN,fertile:day>=len-17&&day<=len-11};
+    }
   }
   return null;
 }
-function getPhase(d) {
-  if (d<=8)  return 'period';
-  if (d<=10) return 'follicular';
-  if (d<=14) return 'ovulation';
-  if (d<=20) return 'luteal-e';
-  if (d<=23) return 'luteal-m';
-  return 'luteal-l';
-}
 
-function buildScroll() {
-  const scroll = document.getElementById('dateScroll');
-  let currentMonth=-1, daysDiv=null;
-  const d = new Date(START);
-  while (d<=END) {
-    const cyc = getCycleDay(d);
-    if (!cyc){d.setDate(d.getDate()+1);continue;}
-    const month = d.getMonth();
-    if (month!==currentMonth) {
-      const mg=document.createElement('div');mg.className='month-group';
-      const mn=document.createElement('div');mn.className='month-name';
-      mn.textContent=MN_SHORT[month];mg.appendChild(mn);
-      daysDiv=document.createElement('div');daysDiv.className='month-days';
-      mg.appendChild(daysDiv);scroll.appendChild(mg);
-      currentMonth=month;
-    }
-    const phase=getPhase(cyc.day);
-    const btn=document.createElement('div');
-    btn.className=`day-btn ${PHASE_META[phase].cls}`;
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth()+1).padStart(2,'0');
-    const dd = String(d.getDate()).padStart(2,'0');
-    btn.dataset.date=`${yyyy}-${mm}-${dd}`;
-    btn.dataset.cycleDay=cyc.day;
-    btn.dataset.phase=phase;
-    btn.innerHTML=`<div class="dnum">${d.getDate()}</div><div class="dname">${DN_SHORT[d.getDay()]}</div><div class="dpip"></div>`;
-    btn.addEventListener('click',()=>selectDate(btn));
-    daysDiv.appendChild(btn);
-    if (d.getTime()===TODAY.getTime()) {
-      setTimeout(()=>{selectDate(btn);btn.scrollIntoView({inline:'center',behavior:'smooth'});},100);
-    }
-    d.setDate(d.getDate()+1);
-  }
-}
+/* ---------- phases + drawings ---------- */
+const PHASES = [
+  {to:2,  key:'menstruation',    name:'Menstruation',    days:'Days 1-2',   bg:'#fde0e0'},
+  {to:6,  key:'early-menstrual', name:'Early menstrual', days:'Days 3-6',   bg:'#fddde3'},
+  {to:12, key:'follicular',      name:'Follicular',      days:'Days 7-12',  bg:'#dde8fb'},
+  {to:15, key:'ovulation',       name:'Ovulation',       days:'Days 13-15', bg:'#d6ecd6'},
+  {to:20, key:'early-luteal',    name:'Early luteal',    days:'Days 16-20', bg:'#fdf0bf'},
+  {to:26, key:'late-luteal',     name:'Late luteal',     days:'Days 21-26', bg:'#fbd9b3'},
+  {to:99, key:'premenstrual',    name:'Premenstrual',    days:'Day 27+',    bg:'#fbdbe4'},
+];
+const phaseOf = day => PHASES.find(p=>day<=p.to);
 
-function selectDate(btn) {
-  document.querySelectorAll('.day-btn.selected').forEach(b=>b.classList.remove('selected'));
-  btn.classList.add('selected');
-  const date=new Date(btn.dataset.date+'T00:00:00');
-  renderDetail(date,parseInt(btn.dataset.cycleDay),btn.dataset.phase);
-}
-
-const PHASE_AVOID = {
-  period:     [],
-  follicular: [],
-  ovulation:  ["L'intensité émotionnelle est haute dans les deux sens — les hauts sont vrais, les bas aussi."],
-  'luteal-e': ["Surinvestir sur des projets ou décisions lancés dans l'élan ovulatoire — l'énergie baisse progressivement."],
-  'luteal-m': ["Sérotonine et GABA en baisse — les stimuli émotionnels et physiques sont perçus plus intensément que la réalité ne le justifie."],
-  'luteal-l': ["Décisions majeures dans un état d'agitation hormonale — la noradrénaline crée un sentiment d'urgence qui n'est pas toujours fondé."],
+/* ---------- per-day content ----------
+   d = already documented (your own reports)   b = biology   k = keep in mind
+   t = tone word   l = level (1 brighter, 0 neutral, -1 rougher)                */
+const DAYS = {
+ 1:{t:'crampy',l:-1,
+  d:"Heavy flow, pain and lower energy. You feel emotional relief once bleeding starts, even when the cramps are bad.",
+  b:"Estrogen and progesterone hit their lowest. Prostaglandins make the uterus contract, which is what causes cramps. Flow usually builds through the day.",
+  k:"Ibuprofen blocks prostaglandins, so it works best taken early rather than once the pain peaks. Heat helps too."},
+ 2:{t:'crampy',l:-1,
+  d:"Heavy flow and pain that disturbed your sleep. Once you chose finishing your website over a group run.",
+  b:"Flow is often heaviest on days 1-3 and prostaglandins stay high, so cramps and lower-back pain can peak. Blood loss slowly lowers iron.",
+  k:"Iron-rich food (red meat, lentils) with vitamin C helps replace losses. Heat and an anti-inflammatory before bed can stop pain waking you."},
+ 3:{t:'bloated',l:-1,
+  d:"One of your most bloated days (3-4). Sadness or a depressive dip has been reported here, though not every cycle.",
+  b:"Fluid shifts and slower, irregular gut movement from prostaglandins commonly cause bloating while hormones sit low. FSH is rising and recruiting follicles.",
+  k:"Less salt and alcohol help with water retention. Water and potassium-rich food (banana, potato) help counter it."},
+ 4:{t:'bloated',l:-1,
+  d:"Still one of your most bloated days. You called it 'absolutely horrible' once, and felt affectionate and romantic on days 4-5 in another cycle.",
+  b:"Flow is usually easing and prostaglandins are falling. Estrogen starts a slow climb, but mood doesn't always follow hormones on schedule.",
+  k:"Bloating can linger a day or two after flow eases. Magnesium-rich food (nuts, dark chocolate) may help with cramps and bloat."},
+ 5:{t:'tender',l:-1,
+  d:"Very emotional, with depressive feelings reported. You haven't found this day consistently good.",
+  b:"Estrogen is rising as follicles grow and the uterine lining starts rebuilding. Pain usually fades, but mood can lag behind the physical recovery.",
+  k:"Protein, iron and sleep are the cheap levers for a low day like this."},
+ 6:{t:'unpredictable',l:0,
+  d:"Inconsistent: a sudden big improvement in one cycle, feeling horrible and extra sensitive in another.",
+  b:"A dominant follicle is usually selected around now and estrogen climbs steadily, supporting serotonin and dopamine. The lift is real but not always smooth.",
+  k:"Both a high and a low are on record here, so keep plans flexible instead of banking on either."},
+ 7:{t:'unsettled',l:0,
+  d:"One report of a sudden depressive dip, the day after a much better day 6. A single observation, not a pattern.",
+  b:"Estrogen keeps rising and the lining thickens. Insulin sensitivity is generally better in the follicular phase, so energy from food tends to be steadier.",
+  k:"If a dip hits, check sleep and food first. Otherwise use the steadier energy for work that needs focus."},
+ 8:{t:'lifting',l:1,
+  d:"Nothing documented yet.",
+  b:"Estrogen keeps rising and cervical mucus is still scant or sticky. High estrogen supports muscle repair, so strength work often feels good this week.",
+  k:"Good window to start demanding projects and heavy lifting while energy is climbing."},
+ 9:{t:'bright',l:1,
+  d:"One emotional dip reported after feeling better earlier. A single observation.",
+  b:"Estrogen is high and accelerating and cervical mucus turns creamy. Verbal fluency and social drive often rise toward ovulation.",
+  k:"A dip here doesn't mean the upswing is over. Hormones are still climbing. Check sleep and caffeine first."},
+ 10:{t:'jittery',l:0,
+  d:"You said 'I feel extremely anxious' on this day, and noted fertile-type cervical mucus around now.",
+  b:"Mucus turns wetter and clearer as estrogen climbs, and testosterone nudges up too, so libido often rises. LH starts to climb.",
+  k:"If you feel wired, caffeine amplifies it. Cutting it after noon is the quickest lever."},
+ 11:{t:'glowing',l:1,
+  d:"Nothing day-specific documented. Vulnerability and high libido are reported around ovulation overall.",
+  b:"Estrogen nears its peak and mucus turns slippery and stretchy (egg-white), the most sperm-friendly type. Fertility is climbing.",
+  k:"Fertility is rising. If you're avoiding pregnancy, this is when contraception matters most."},
+ 12:{t:'self-critical',l:0,
+  d:"You said 'I feel fat and ugly' on this day (Oct 6). One report, not a pattern.",
+  b:"Estrogen is at or near its peak and the LH surge is close, which triggers ovulation roughly 24-36 hours later.",
+  k:"Skip scale checks and progress comparisons today. Water shifts and mood both skew how your body reads."},
+ 13:{t:'magnetic',l:1,
+  d:"Libido, vulnerability and relationship sensitivity are reported around ovulation, but nothing is confirmed for this exact day.",
+  b:"Estrogen peaks and the LH surge begins. Libido is typically near its highest and many people feel more energetic and social.",
+  k:"Good day for anything that needs confidence or connection. Protect your sleep, it is often lighter around ovulation."},
+ 14:{t:'high',l:1,
+  d:"You said you felt horrible about your body on this day. One report.",
+  b:"Around the LH surge the egg is released within about a day. Some people feel a one-sided pelvic twinge (mittelschmerz).",
+  k:"Two body-image dips are on record near ovulation (days 12 and 14). Give yourself a buffer before judging anything."},
+ 15:{t:'drop risk',l:-1,
+  d:"End of ovulation: a sudden low and loss of confidence, in your words. Day 15 once brought extreme sensitivity and trouble working.",
+  b:"Estrogen falls sharply after its peak just as progesterone starts rising. That swing can trigger a mood dip in people who are sensitive to it.",
+  k:"Confidence drops can arrive suddenly here. Hold off on big self-judgments for a day. It tends to return a little in the luteal phase."},
+ 16:{t:'recovering',l:0,
+  d:"Your confidence tends to come back a little in the luteal phase. Nothing else documented for this day.",
+  b:"The corpus luteum forms and starts making progesterone. Body temperature rises about 0.3-0.5 C and stays up until your period.",
+  k:"Ease back in. Protein, daylight and sleep help the recovery from the post-ovulation drop."},
+ 17:{t:'hungry',l:0,
+  d:"Nothing documented yet.",
+  b:"Progesterone climbs. It slows digestion and raises appetite and sleepiness. Metabolic rate rises a little, roughly 100-300 kcal per day.",
+  k:"A bigger appetite is normal physiology. Meet it with protein and fibre rather than fighting it."},
+ 18:{t:'steady',l:0,
+  d:"A post-ovulation low is mentioned in general, but there is no day-specific report.",
+  b:"Progesterone is rising toward its peak. Water retention, breast tenderness and a shorter fuse can start to appear.",
+  k:"A good stretch to front-load deadlines before the late-luteal days."},
+ 19:{t:'steady',l:0,
+  d:"Acute back pain after training was reported once in this part of your cycle.",
+  b:"Progesterone is climbing toward its peak, usually about a week after ovulation. Sleep can get lighter, partly because body temperature runs higher.",
+  k:"Hip and lumbar mobility work before heavy hinging is cheap insurance if your back flares."},
+ 20:{t:'steady',l:0,
+  d:"No pattern documented for this day.",
+  b:"Progesterone is near its peak. Its metabolite allopregnanolone acts on GABA receptors: calming for some people, jittery or anxious for others.",
+  k:"Start protecting sleep now. It's the best-documented thing that breaks down in the next few days."},
+ 21:{t:'sleepless',l:-1,
+  d:"Insomnia and emotional difficulty are mentioned around here. Sleep trouble is better documented than any specific mood.",
+  b:"Progesterone peaks around now. If there's no pregnancy, the corpus luteum starts to break down. Hunger and cravings are common.",
+  k:"Cool room, no caffeine after noon, screens down earlier. Sleep is the lever with the best evidence for you."},
+ 22:{t:'anxious',l:-1,
+  d:"Your strongest anxiety record: 'I feel extremely anxious today' (Apr 29). You have also called this phase 'absolutely horrible'.",
+  b:"Estrogen and progesterone both begin to fall. That withdrawal drives PMS symptoms in people who are sensitive to hormonal swings.",
+  k:"On anxious days, walking or lifting and less caffeine tend to take the edge off. Reduce the number of open decisions."},
+ 23:{t:'hungry',l:0,
+  d:"You were very hungry on day 23 (Oct 17). Appetite is documented here, mood isn't.",
+  b:"Hormones keep falling and serotonin activity tends to dip, which can raise anxiety, irritability and appetite.",
+  k:"Regular meals with protein help. Skipped meals tend to amplify luteal irritability and cravings."},
+ 24:{t:'wired',l:0,
+  d:"On Oct 18 you were hyperactive, restless and full of work ideas, yet physically exhausted.",
+  b:"Falling progesterone lowers calming GABA tone while stress systems stay reactive, so many people feel wired, restless or sleep poorly.",
+  k:"Capture the ideas, but protect sleep. Tonight's rest matters more than a third work session."},
+ 25:{t:'tender',l:0,
+  d:"Nothing documented yet.",
+  b:"Water retention and breast tenderness commonly peak, skin can break out, and sleep is often lighter.",
+  k:"Lower salt, more water and looser clothes help with the bloat while it lasts."},
+ 26:{t:'driven',l:0,
+  d:"Much higher sexual desire before your period, sometimes without wanting romantic closeness. Exact onset isn't confirmed.",
+  b:"Prostaglandins start building in the lining. Libido often rises before the period as progesterone falls.",
+  k:"Desire and wanting closeness can come apart before your period. It helps to name which one you mean."},
+ 27:{t:'driven',l:0,
+  d:"Energetic, accelerated and decisive even on little sleep, with high libido. Sometimes fine, but stress can tip it into restless and anxious.",
+  b:"Both hormones are near their lowest. Bloating, cramps and mood swings are classic late-luteal signs.",
+  k:"Use the drive on concrete tasks. Avoid stacking extra stressors on top, since that's what tips it into anxiety."},
+ 28:{t:'bloated',l:-1,
+  d:"Bloating, cramps and worry about body changes close to your period. No consistent mood pattern.",
+  b:"Progesterone is at its floor and the lining is about to shed. Prostaglandins rise, so mild cramps can start before the flow.",
+  k:"Keep ibuprofen and a heat pack within reach. Starting early works better."},
+ 29:{t:'crampy',l:-1,
+  d:"Your periods often begin around here. Premenstrual intensity and libido are reported, not specifically for this day.",
+  b:"Body temperature typically drops just before bleeding starts. Progesterone is at baseline, so the lining sheds.",
+  k:"Have supplies ready and take ibuprofen at the first cramp rather than waiting."},
+ 30:{t:'waiting',l:0,
+  d:"Nothing day-specific documented for day 30.",
+  b:"Your cycles have run 26-31 days. A later period usually means ovulation came later, and stress can shift timing too.",
+  k:"Garmin adjusts the forecast once you log the period. Keep supplies on hand."}
 };
-const PHASE_PRIORITIZE = {
-  period:     ["Fer et protéines — la reconstruction de l'endomètre et la production de globules rouges sont actives tout au long de la phase."],
-  follicular: ["Fenêtre optimale pour la prise de décision, les projets qui demandent de l'élan et la performance physique."],
-  ovulation:  ["Libido et connexion au maximum. Fenêtre de fertilité courte — 12 à 24h après l'ovulation, l'ovocyte n'est plus viable."],
-  'luteal-e': ["Besoins caloriques légèrement plus élevés — le métabolisme est plus actif en phase lutéale."],
-  'luteal-m': ["Sommeil et récupération — la dette de sommeil se cumule vite quand la progestérone perturbe le sommeil profond."],
-  'luteal-l': ["L'énergie noradrénergique de cette phase est réelle — bon moment pour les tâches qui demandent de la décision rapide, du tri, du nettoyage mental. Physiquement le corps gère bien l'effort mais la récupération est plus lente — privilégier la force sur l'endurance."],
-};
+const dayData = day => DAYS[Math.min(day,30)];
 
-function renderDetail(date,cycleDay,phase) {
-  const meta=PHASE_META[phase];
-  const data=DAY_DATA[Math.min(cycleDay,28)]||DAY_DATA[28];
-  const fertility=FERTILITY[Math.min(cycleDay,28)]||'none';
-  const dateLabel=`${DN_LONG[date.getDay()]} ${date.getDate()} ${MN_LONG[date.getMonth()]}`;
-  const avoidList = data.avoid?.length ? data.avoid : PHASE_AVOID[phase]||[];
-  const prioritizeList = data.prioritize?.length ? data.prioritize : PHASE_PRIORITIZE[phase]||[];
+/* ---------- state ---------- */
+const now = new Date();
+const TODAY = dn(now.getFullYear(), now.getMonth(), now.getDate());
+const clamp = n => Math.max(RANGE_START, Math.min(RANGE_END, n));
+const state = {sel: clamp(TODAY), tab:'day'};
+const weekStart = n => n - ((dt(n).getUTCDay()+6)%7);        // Monday
 
-  let html=`<div class="day-hero">
-    <div class="day-hero-top">
-      <div>
-        <div class="day-hero-date">${dateLabel}</div>
-        <div class="day-num-label">Jour ${cycleDay} du cycle</div>
-      </div>
-      <div class="phase-badge" style="background:${meta.color}">${meta.label}</div>
+const $ = id => document.getElementById(id);
+const fmtLong  = n => `${WD[dt(n).getUTCDay()]} ${dt(n).getUTCDate()} ${MO[dt(n).getUTCMonth()]}`;
+const fmtShort = n => `${MO[dt(n).getUTCMonth()]} ${dt(n).getUTCDate()}`;
+
+/* ---------- render ---------- */
+function renderNav(){
+  const ws = weekStart(state.sel);
+  $('range').textContent = `${fmtShort(ws)} - ${fmtShort(ws+6)}`;
+  $('prevW').disabled = ws <= weekStart(RANGE_START);
+  $('nextW').disabled = ws+7 > RANGE_END;
+  $('todayBtn').hidden = (state.sel === clamp(TODAY));
+}
+
+function dotsHTML(i){
+  if(!i) return '';
+  return (i.period?'<span class="dot p"></span>':'') + (i.fertile?'<span class="dot f"></span>':'');
+}
+
+function renderStrip(){
+  const ws = weekStart(state.sel);
+  let h='';
+  for(let k=0;k<7;k++){
+    const n=ws+k, i=info(n);
+    h+=`<button class="dbtn${n===state.sel?' sel':''}${n===TODAY?' istoday':''}" data-n="${n}" ${i?'':'disabled'}>
+      <span class="wd">${WD[dt(n).getUTCDay()].slice(0,2)}</span>
+      <span class="num">${dt(n).getUTCDate()}</span>
+      <span class="dots">${dotsHTML(i)}</span></button>`;
+  }
+  $('strip').innerHTML=h;
+}
+
+function renderDay(){
+  renderStrip();
+  const i=info(state.sel);
+  if(!i){ $('dayBody').innerHTML='<p class="foot">No forecast for this date.</p>'; return; }
+  const p=phaseOf(i.day), c=dayData(i.day);
+  let chips='';
+  if(state.sel===TODAY) chips+='<span class="chip t">Today</span>';
+  if(i.period) chips+='<span class="chip p">Period</span>';
+  if(i.fertile) chips+='<span class="chip f">Fertile window</span>';
+  $('dayBody').innerHTML=`
+    <div class="hero" style="--hero:${p.bg}"><img src="img/${p.key}.webp" alt="" width="520" height="440"></div>
+    <div class="titlerow">
+      <div class="phase">${p.name}</div>
+      <div class="sub">Day ${i.day} &middot; ${fmtLong(state.sel)}</div>
     </div>
-    <div class="fertility-bar">
-      <div class="fertility-label">Fertilité</div>
-      <div class="fertility-pill fertility-${fertility}">${FERTILITY_LABEL[fertility]}</div>
-    </div>
-  </div>`;
-
-  // BIO
-  if (data.bio?.length) {
-    html+=`<div class="info-card"><div class="card-header"><div class="card-label bio">Ce qui se passe</div></div><div class="card-body">`;
-    data.bio.forEach(b=>{html+=`<div class="info-row"><span class="row-icon">◆</span><span>${b}</span></div>`;});
-    html+=`</div></div>`;
-  }
-
-  // MOOD
-  if (data.mood) {
-    html+=`<div class="info-card"><div class="card-header"><div class="card-label who">État émotionnel</div></div><div class="card-body"><div class="info-row"><span class="row-icon" style="color:var(--ovulation)">◈</span><span>${data.mood}</span></div></div></div>`;
-  }
-
-  // AVOID
-  if (avoidList.length) {
-    html+=`<div class="info-card"><div class="card-header"><div class="card-label avoid">À éviter</div></div><div class="card-body">`;
-    avoidList.forEach(a=>{html+=`<div class="info-row"><span class="row-icon" style="color:var(--period)">✗</span><span>${a}</span></div>`;});
-    html+=`</div></div>`;
-  }
-
-  // PRIORITIZE
-  if (prioritizeList.length) {
-    html+=`<div class="info-card"><div class="card-header"><div class="card-label green">À privilégier</div></div><div class="card-body">`;
-    prioritizeList.forEach(p=>{html+=`<div class="info-row"><span class="row-icon" style="color:var(--follicular)">✓</span><span>${p}</span></div>`;});
-    html+=`</div></div>`;
-  }
-
-  // NOTE
-  if (data.note) {
-    html+=`<div class="pull-quote"><p>${data.note}</p></div>`;
-  }
-
-  document.getElementById('detailSection').innerHTML=html;
+    ${chips?`<div class="chips">${chips}</div>`:''}
+    <div class="block"><h3>Already documented</h3><p>${c.d}</p></div>
+    <div class="block"><h3>What's happening</h3><p>${c.b}</p></div>
+    <div class="block"><h3>Keep in mind</h3><p>${c.k}</p></div>
+    <p class="foot">Based on your Garmin cycle data and the patterns you've reported. Dates after Oct 25 are forecasts.</p>`;
 }
 
-let calBuilt = false;
-function switchTab(tab) {
-  document.getElementById('view-day').style.display = tab==='day' ? 'block' : 'none';
-  document.getElementById('view-cal').style.display = tab==='cal' ? 'block' : 'none';
-  document.getElementById('tab-day').classList.toggle('active', tab==='day');
-  document.getElementById('tab-cal').classList.toggle('active', tab==='cal');
-  if (tab==='cal' && !calBuilt) { buildCalendar(); calBuilt=true; }
-}
-
-function buildCalendar() {
-  const container = document.getElementById('view-cal');
-  const phaseClass = { period:'period-day', follicular:'follicular-day', ovulation:'ovulation-day', 'luteal-e':'luteal-e-day', 'luteal-m':'luteal-m-day', 'luteal-l':'luteal-l-day' };
-
-  let html = `<div class="cal-legend">
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--period)"></div>Règles</div>
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--follicular)"></div>Folliculaire</div>
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--ovulation)"></div>Ovulation</div>
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--luteal-e)"></div>Post-ovul.</div>
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--luteal-m)"></div>Lutéale</div>
-    <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--luteal-l)"></div>Pré-règles</div>
-  </div>`;
-
-  for (let i = 0; i < 6; i++) {
-    const month = (7 + i) % 12;
-    const year = (7 + i) < 12 ? 2026 : 2027;
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month+1, 0).getDate();
-    html += `<div class="month-title">${MN_SHORT[month]} ${year}</div><div class="cal-grid">`;
-    ['Di','Lu','Ma','Me','Je','Ve','Sa'].forEach(d => { html += `<div class="cal-day-label">${d}</div>`; });
-    for (let i=0; i<firstDay; i++) html += `<div class="cal-cell empty"></div>`;
-    for (let day=1; day<=daysInMonth; day++) {
-      const date = new Date(year, month, day);
-      const cyc = getCycleDay(date);
-      const phase = cyc ? getPhase(cyc.day) : null;
-      const pclass = phase ? phaseClass[phase] : '';
-      const isToday = date.getTime() === TODAY.getTime();
-      html += `<div class="cal-cell ${pclass} ${isToday?'is-today':''}">${day}${phase?'<div class="cpip"></div>':''}</div>`;
-    }
-    html += `</div>`;
+function renderWeek(){
+  const ws=weekStart(state.sel);
+  const days=[]; for(let k=0;k<7;k++){ const n=ws+k, i=info(n); if(i) days.push({n,i,p:phaseOf(i.day),c:dayData(i.day)}); }
+  // summary
+  const phases=[]; days.forEach(x=>{ if(!phases.includes(x.p.name)) phases.push(x.p.name); });
+  const names = arr => arr.map(x=>WD[dt(x.n).getUTCDay()]).join(', ');
+  const rough=days.filter(x=>x.c.l<0), bright=days.filter(x=>x.c.l>0);
+  const first=days[0], last=days[days.length-1];
+  let sum=`<div class="head">${phases.join(' &rarr; ')}</div>`;
+  sum+=`<div class="line">Starts <b>${first.c.t}</b>, ends <b>${last.c.t}</b>.</div>`;
+  sum+=`<div class="line">Rougher: <b>${rough.length?names(rough):'nothing flagged'}</b></div>`;
+  sum+=`<div class="line">Brighter: <b>${bright.length?names(bright):'nothing flagged'}</b></div>`;
+  let rows='';
+  for(let k=0;k<7;k++){
+    const n=ws+k, i=info(n);
+    if(!i){ rows+=`<button class="row" disabled><div class="rtxt"><div class="d">${fmtLong(n)}</div><div class="s">outside forecast</div></div></button>`; continue; }
+    const p=phaseOf(i.day), c=dayData(i.day);
+    rows+=`<button class="row${n===state.sel?' sel':''}" data-n="${n}">
+      <div class="thumb" style="--hero:${p.bg}"><img src="img/${p.key}.webp" alt="" loading="lazy"></div>
+      <div class="rtxt"><div class="d">${fmtLong(n)}</div><div class="s">Day ${i.day} &middot; ${p.name}</div></div>
+      <span class="tone${c.l>0?' up':c.l<0?' dn':''}">${c.t}</span></button>`;
   }
-  container.innerHTML = html;
+  $('weekBody').innerHTML=`<div class="summary">${sum}</div>${rows}`;
 }
 
-function fixLayout() {
-  const header = document.querySelector('header');
-  const tabs = document.querySelector('.tabs');
-  const hh = header.offsetHeight;
-  const th = tabs.offsetHeight;
-  tabs.style.top = hh + 'px';
-  document.body.style.paddingTop = (hh + th) + 'px';
+function render(){
+  renderNav();
+  $('vDay').hidden = state.tab!=='day';
+  $('vWeek').hidden = state.tab!=='week';
+  $('tDay').classList.toggle('on',state.tab==='day');
+  $('tWeek').classList.toggle('on',state.tab==='week');
+  if(state.tab==='day') renderDay(); else renderWeek();
 }
-window.addEventListener('load', fixLayout);
-window.addEventListener('resize', fixLayout);
 
-buildScroll();
+/* ---------- events ---------- */
+$('strip').addEventListener('click',e=>{ const b=e.target.closest('.dbtn'); if(b&&!b.disabled){ state.sel=+b.dataset.n; render(); }});
+$('weekBody').addEventListener('click',e=>{ const b=e.target.closest('.row'); if(b&&!b.disabled){ state.sel=+b.dataset.n; state.tab='day'; render(); window.scrollTo(0,0); }});
+$('prevW').addEventListener('click',()=>{ state.sel=clamp(state.sel-7); render(); });
+$('nextW').addEventListener('click',()=>{ state.sel=clamp(state.sel+7); render(); });
+$('todayBtn').addEventListener('click',()=>{ state.sel=clamp(TODAY); render(); });
+$('tDay').addEventListener('click',()=>{ state.tab='day'; render(); window.scrollTo(0,0); });
+$('tWeek').addEventListener('click',()=>{ state.tab='week'; render(); window.scrollTo(0,0); });
+
+render();
 </script>
 </body>
 </html>
