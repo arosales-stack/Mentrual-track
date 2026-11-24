@@ -147,8 +147,8 @@ const dt = n => new Date(n*864e5);
 const WD  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const MO  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-// period starts: Aug 27, Sep 25, Oct 25 = logged. Nov 22 onward = Garmin forecast (28-day cycles)
-const STARTS = [[2026,7,27],[2026,8,25],[2026,9,25],[2026,10,22],[2026,11,20],[2027,0,17],[2027,1,14],[2027,2,14],[2027,3,11]].map(a=>dn(...a));
+// period starts: Aug 27, Sep 25, Oct 25, Nov 20 = logged. Dec 18 onward = forecast (28-day cycles)
+const STARTS = [[2026,7,27],[2026,8,25],[2026,9,25],[2026,10,20],[2026,11,18],[2027,0,15],[2027,1,12],[2027,2,12],[2027,3,9]].map(a=>dn(...a));
 const RANGE_START = STARTS[0];
 const RANGE_END   = dn(2027,2,31);
 const PERIOD_LEN  = 8;
@@ -368,7 +368,7 @@ function renderDay(){
     <div class="card c1"><h3>Already documented</h3><p>${c.d}</p></div>
     <div class="card"><h3>What's happening</h3><p>${c.b}</p></div>
     <div class="card c3"><h3>Keep in mind</h3><p>${c.k}</p></div>
-    <p class="foot">Based on your Garmin cycle data and the patterns you've reported. Dates after Oct 25 are forecasts.</p>`;
+    <p class="foot">Based on your Garmin cycle data and the patterns you've reported. Dates after Nov 20 are forecasts.</p>`;
 }
 
 function renderWeek(){
